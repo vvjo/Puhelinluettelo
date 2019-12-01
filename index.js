@@ -58,7 +58,7 @@ app.get("/api/persons/:id", (req, res) => {
     
 })
 
-app.delete("/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id)
     persons = persons.filter(pers => pers.id !== id)
 
@@ -70,7 +70,7 @@ const generateId = () => {
     return Math.floor(Math.random()*100)
 }
 
-app.post("/persons", (req, res) => {
+app.post("/api/persons", (req, res) => {
     const bod = req.body
     
     if(!bod.name || !bod.number){
