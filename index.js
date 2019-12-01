@@ -38,15 +38,15 @@ let persons = [
     }
 ]
 
-app.get('/persons', (req, res) => {
+app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
-app.get('/info', (req, res) => {
+app.get('/api/info', (req, res) => {
     res.send(`<p>Phonebook has info for ${persons.length} people</p><br><p>${new Date()}</p>`)
 })
 
-app.get("/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id)
     const person = persons.find(person => person.id === id)
 
