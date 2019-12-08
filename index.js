@@ -6,9 +6,6 @@ const bodyParser = require("body-parser")
 const cors = require("cors")
 const morgan = require("morgan")
 const Person = require("./models/person")
-const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
-
 
 app.use(express.static("build"))
 app.use(cors())
@@ -16,13 +13,6 @@ app.use(bodyParser.json())
 
 morgan.token('contentti', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contentti'))
-
-var personSchema = mongoose.Schema({
-    name: { type: String, required: true, unique: true, minlength: 3},
-    number: { type: Number, required: true, min: 1000}
-});
-
-personSchema.plugin(uniqueValidator)
 
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(persones => {
