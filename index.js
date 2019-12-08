@@ -18,8 +18,8 @@ morgan.token('contentti', function (req, res) { return JSON.stringify(req.body) 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contentti'))
 
 var personSchema = mongoose.Schema({
-    name: { type: String, required: true, unique: true },
-    number: { type: Number, required: true, minlength: 6}
+    name: { type: String, required: true, unique: true, minlength: 3},
+    number: { type: Number, required: true, min: 1000}
 });
 
 personSchema.plugin(uniqueValidator)
