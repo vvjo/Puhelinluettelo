@@ -52,14 +52,14 @@ app.put("/api/persons/:id", (req, res, next) => {
     .catch(error => next(error))
 })
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
     Person.findByIdAndDelete(req.params.id).then(resu => {
         res.status(204).end()
     })
         .catch(error => next(error))
 })
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     const bod = req.body
 
     if (bod.name === "" || bod.number === null) {
