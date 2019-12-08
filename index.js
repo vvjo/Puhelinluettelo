@@ -4,15 +4,25 @@ const app = express()
 
 const bodyParser = require("body-parser")
 const cors = require("cors")
-var morgan = require("morgan")
+const morgan = require("morgan")
 const Person = require("./models/person")
+const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+
 
 app.use(express.static("build"))
 app.use(cors())
 app.use(bodyParser.json())
+
 morgan.token('contentti', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contentti'))
 
+var personSchema = mongoose.Schema({
+    name: { type: String, required: true, unique: true },
+    number: { type: String, required: true, minlength: 6}
+});
+
+personSchema.plugin(uniqueValidator)
 
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(persones => {
@@ -65,18 +75,16 @@ app.post("/api/persons", (req, res) => {
     if (bod.name === "" || bod.number === null) {
         return res.status(400).json({ error: "name or number missing" })
     }
-    /*
-    if(persons.some(pers => pers.name === bod.name)){
-        return res.status(400).json({error: "name is already added"})
-    }*/
 
     const person = new Person({
         name: bod.name,
         number: bod.number,
     })
-    person.save().then(saved => {
-        res.json(saved.toJSON())
-    })
+    
+    person.save()
+    .then(saved => saved.toJSON())
+    .then(savedFormatted => response.json(savedFormatted))
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
@@ -90,6 +98,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError' && error.kind == 'ObjectId') {
         return response.status(400).send({ error: 'malformatted id' })
+    }else if(error.name === 'ValidationError'){
+        return response.status(400).json({error: error.message})
     }
 
     next(error)
