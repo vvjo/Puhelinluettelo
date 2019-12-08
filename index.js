@@ -39,7 +39,6 @@ app.get("/api/persons/:id", (req, res, next) => {
 
 app.put("/api/persons/:id", (req, res, next) => {
     const body = req.body
-    console.log(req.params)
     const person = {
         name: body.name,
         number: body.number
@@ -87,12 +86,10 @@ const unknownEndpoint = (req, res) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
-
+    console.error(error.message, " backend index errorhandler")
     if (error.name === 'CastError' && error.kind == 'ObjectId') {
         return response.status(400).send({ error: 'malformatted id' })
     }else if(error.name === 'ValidationError'){
-        console.log(error.message)
         return response.status(400).json({error: error.message})
     }
 
