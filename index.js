@@ -19,7 +19,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :c
 
 var personSchema = mongoose.Schema({
     name: { type: String, required: true, unique: true },
-    number: { type: String, required: true, minlength: 6}
+    number: { type: Number, required: true, minlength: 6}
 });
 
 personSchema.plugin(uniqueValidator)
