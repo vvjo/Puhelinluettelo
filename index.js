@@ -17,9 +17,9 @@ app.use(bodyParser.json())
 morgan.token('contentti', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contentti'))
 
-const personSchema = mongoose.Schema({
+var personSchema = mongoose.Schema({
     name: { type: String, required: true, unique: true },
-    number: { type: Number, required: true, minlength: 6 }
+    number: { type: Number, required: true, minlength: 6}
 });
 
 personSchema.plugin(uniqueValidator)
@@ -55,21 +55,21 @@ app.put("/api/persons/:id", (req, res, next) => {
         number: body.number
     }
 
-    Person.findByIdAndUpdate(req.params.id, person, { new: true })
-        .then(updated => {
-            res.json(updated.toJSON())
-        })
-        .catch(error => next(error))
+    Person.findByIdAndUpdate(req.params.id, person, { new: true})
+    .then(updated => {
+        res.json(updated.toJSON())
+    })
+    .catch(error => next(error))
 })
 
-app.delete("/api/persons/:id", (req, res, next) => {
+app.delete("/api/persons/:id", (req, res) => {
     Person.findByIdAndDelete(req.params.id).then(resu => {
         res.status(204).end()
     })
         .catch(error => next(error))
 })
 
-app.post("/api/persons", (req, res, next) => {
+app.post("/api/persons", (req, res) => {
     const bod = req.body
 
     if (bod.name === "" || bod.number === null) {
@@ -80,11 +80,11 @@ app.post("/api/persons", (req, res, next) => {
         name: bod.name,
         number: bod.number,
     })
+    person.save().then(saved => {
+        res.json(saved.toJSON())
+    })
+    .catch(error => next(error))
 
-    person.save()
-        .then(saved => saved.toJSON())
-        .then(savedFormatted => response.json(savedFormatted))
-        .catch(error => next(error))
 })
 
 const unknownEndpoint = (req, res) => {
@@ -98,8 +98,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError' && error.kind == 'ObjectId') {
         return response.status(400).send({ error: 'malformatted id' })
-    } else if (error.name === 'ValidationError') {
-        return response.status(400).json({ error: error.message })
+    }else if(error.name === 'ValidationError'){
+        return response.status(400).json({error: error.message})
     }
 
     next(error)
