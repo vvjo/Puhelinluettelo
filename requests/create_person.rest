@@ -1,7 +1,7 @@
-post http://localhost:3001/api/persons
+post https://puh-bend.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
-    "name": "asddd",
-    "number": "22323"
+    "name": "asd",
+    "number": "123123123"
 }
