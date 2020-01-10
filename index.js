@@ -1,24 +1,23 @@
-require("dotenv").config()
+require('dotenv').config()
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const morgan = require('morgan')
+const Person = require('./models/person')
 
-const bodyParser = require("body-parser")
-const cors = require("cors")
-const morgan = require("morgan")
-const Person = require("./models/person")
-
-app.use(express.static("build"))
+app.use(express.static('build'))
 app.use(cors())
 app.use(bodyParser.json())
 
-morgan.token('contentti', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('contentti', function (req) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :contentti'))
 
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(persones => {
         res.json(persones.map(person => person.toJSON()))
-    });
-});
+    })
+})
 
 app.get('/api/info', (req, res) => {
     Person.countDocuments({}, (err, count) => {
@@ -26,7 +25,7 @@ app.get('/api/info', (req, res) => {
     })
 })
 
-app.get("/api/persons/:id", (req, res, next) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id).then(pers => {
         if (pers) {
             res.json(pers.toJSON())
@@ -37,32 +36,32 @@ app.get("/api/persons/:id", (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.put("/api/persons/:id", (req, res, next) => {
+app.put('/api/persons/:id', (req, res, next) => {
     const body = req.body
     const person = {
         name: body.name,
         number: body.number
     }
-    
-    Person.findByIdAndUpdate(req.params.id, person, { new: true})
-    .then(updated => {
-        res.json(updated.toJSON())
-    })
-    .catch(error => next(error))
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updated => {
+            res.json(updated.toJSON())
+        })
+        .catch(error => next(error))
 })
 
-app.delete("/api/persons/:id", (req, res, next) => {
-    Person.findByIdAndDelete(req.params.id).then(resu => {
+app.delete('/api/persons/:id', (req, res, next) => {
+    Person.findByIdAndDelete(req.params.id).then(() => {
         res.status(204).end()
     })
         .catch(error => next(error))
 })
 
-app.post("/api/persons", (req, res, next) => {
+app.post('/api/persons', (req, res, next) => {
     const bod = req.body
 
-    if (bod.name === "" || bod.number === null) {
-        return res.status(400).json({ error: "name or number missing" })
+    if (bod.name === '' || bod.number === null) {
+        return res.status(400).json({ error: 'name or number missing' })
     }
 
     const person = new Person({
@@ -70,27 +69,27 @@ app.post("/api/persons", (req, res, next) => {
         number: bod.number,
     })
     person
-    .save()
-    .then(saved => saved.toJSON())
-    .then(savedformatted => {
-        res.json(savedformatted)
-    })
-    .catch(error => next(error))
+        .save()
+        .then(saved => saved.toJSON())
+        .then(savedformatted => {
+            res.json(savedformatted)
+        })
+        .catch(error => next(error))
 
 })
 
 const unknownEndpoint = (req, res) => {
-    res.status(404).send({ error: "unknown endpoint" })
+    res.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message, " backend index errorhandler")
+    console.error(error.message, ' backend index errorhandler')
     if (error.name === 'CastError' && error.kind == 'ObjectId') {
         return response.status(400).send({ error: 'malformatted id' })
-    }else if(error.name === 'ValidationError'){
-        return response.status(400).json({error: error.message})
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)

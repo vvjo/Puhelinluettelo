@@ -10,7 +10,7 @@ const name = process.argv[3]
 const number = process.argv[4]
 
 const url = `mongodb+srv://vaino:${password}@cluster0-7kftd.mongodb.net/person-app?retryWrites=true&w=majority`
-mongoose.set("useUnifiedTopology", true)
+mongoose.set('useUnifiedTopology', true)
 mongoose.connect(url, { useNewUrlParser: true })
 
 const personSchema = new mongoose.Schema({
@@ -21,21 +21,22 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 if (name === undefined) {
     Person.find({}).then(result => {
-        console.log("phonebook:")
+        console.log('phonebook:')
         result.forEach(pers => {
             console.log(`${pers.name} ${pers.number}`)
         })
         mongoose.connection.close()
     })
 } else {
-
     const person = new Person({
-        "name": name,
-        "number": number,
+        'name': name,
+        'number': number,
     })
-
-    person.save().then(response => {
-        console.log(`added ${name} number ${number} to phone book`);
-        mongoose.connection.close();
-    })
+    try {
+        person.save()
+        console.log(`added ${name} number ${number} to phone book`)
+        mongoose.connection.close()
+    } catch (error) {
+        console.log(error)
+    }
 }
